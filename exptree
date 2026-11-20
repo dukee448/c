@@ -1,0 +1,85 @@
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<ctype.h>
+struct node
+{
+    char data;
+    struct node *left,*right;
+};
+struct node *stack[100];
+int top=-1;
+void push(struct node *newnode)
+{
+    stack[++top]=newnode;
+}
+struct node *pop()
+{
+    return stack[top--];
+}
+struct node *create(char postfix[])
+{
+    struct node *newnode;
+    int i;
+    for(i=0;postfix[i]!='\0';i++)
+    {
+        newnode=(struct node *)malloc(sizeof(struct node));
+        newnode->data=postfix[i];
+        newnode->left=NULL;
+        newnode->right=NULL;
+        if(isalnum(postfix[i]))
+            push(newnode);
+        else
+        {
+            newnode->right=pop();
+            newnode->left=pop();
+            push(newnode);
+        }
+    }
+    return pop();
+}
+void preorder(struct node *root)
+{
+    if(root!=NULL)
+    {
+        printf("%c",root->data);
+        preorder(root->left);
+        preorder(root->right);
+    }
+}
+void inorder(struct node *root)
+{
+    if(root!=NULL)
+    {
+        if(root->left!=NULL)
+            printf("(");
+        inorder(root->left);
+        printf("%c",root->data);
+        inorder(root->right);
+        if(root->right!=NULL)
+            printf(")");
+    }
+}
+void postorder(struct node *root)
+{
+    if(root!=NULL)
+    {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%c",root->data);
+    }
+}
+void main()
+{
+    char postfix[100];
+    struct node *root;
+    printf("Enter the postfix expression: ");
+    scanf("%s",postfix);
+    root=create(postfix);
+    printf("Infix expression: ");
+    inorder(root);
+    printf("\nPrefix expression: ");
+    preorder(root);
+    printf("\nPostfix expression: ");
+    postorder(root);
+}
